@@ -1,47 +1,56 @@
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, View, Button, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import { StyleSheet, View, FlatList, Button } from "react-native";
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
 
 export default function App() {
+  const [courseGoals, setCourseGoals] = useState(["Goal 1", "Goal 2"]);
+  const [isAddMode, setAddMode] = useState(false);
 
-  const [enteretGoal, setEnteretGoal] = useState("");
+  const addGoalHandler = (newGoal) => {
+    setCourseGoals((currentCourseGoals) => [...currentCourseGoals, newGoal]);
+    setAddMode(false);
+  };
+  const cancelAddGoalHandler = () => {
+    setAddMode(false);
+  };
+  const changeModalVisibility = () => {
+    setAddMode(true);
+  };
 
-  const goalInputHandler = (enteretText) => {
-    setEnteretGoal(enteretText);
-  }
-
-const addGoalHandler = () => {
-    console.log(enteretGoal, 'ag')
-}
+  const removeGoalHandler = (itemIndex) => {
+    let currentGoalsList = [...courseGoals];
+    currentGoalsList.splice(itemIndex, 1);
+    setCourseGoals(currentGoalsList);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <TextInput placeholder="Course goal"
-                   style={styles.inputText}
-                   onChangeText={ goalInputHandler }
-                   />
-        <Button title="Add"
-                onPress={addGoalHandler}
-                />
-      </View>
+      <Button title="Add new button" onPress={changeModalVisibility} />
+      <GoalInput
+        isAddMode={isAddMode}
+        onAddGoalHandler={addGoalHandler}
+        onChangeModalVisibility={changeModalVisibility}
+        onCancelAddGoalHandler={cancelAddGoalHandler}
+      />
+
+      <FlatList
+        data={courseGoals}
+        keyExtractor={(item, index) => "key" + index}
+        renderItem={(itemData) => (
+          <GoalItem
+            text={itemData.item}
+            index={itemData.index}
+            removeGoal={removeGoalHandler}
+          />
+        )}
+      ></FlatList>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 30,
-
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  inputText: {
-    borderColor: 'black',
-    width: '80%',
-    borderWidth: 1,
-    paddingLeft: 10,
+    padding: 30
   }
 });
